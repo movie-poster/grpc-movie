@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+package api.v1;
+option go_package = "template-grpc/objectvalues";
+
+message User {
+    string name = 1;
+    string document = 2;
+    string phone = 3;
+}
+
+message Users {
+    repeated User users = 1;
+}
+
+
+message ListRequest {
+    int32 offset = 1;
+}
+
+message Response {
+    int32 id = 1;
+    bool is_ok = 2;
+    string message =3;
+}
+
+
+service UserCrud {
+    rpc Insert(User) returns (Response) {}
+    rpc Update(User) returns (Response) {}
+    rpc List(ListRequest) returns (Users) {}
+    rpc Delete(User) returns (Response) {}
+}
