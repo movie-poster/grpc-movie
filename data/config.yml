@@ -1,16 +1,16 @@
 database:
   driver: "mysql"
   dbname: "usuario"
-  username: "root"
-  password: ""
-  host: "localhost"
+  username: "admin"
+  password: "micontra33segura"
+  host: "db-services.cnku4mcgwdw8.us-east-2.rds.amazonaws.com"
   port: "3306"
   max_lifetime: 7200
   max_open_conns: 150
   max_idle_conns: 50
 
 server:
-  port: "3001"
+  port: "3002"
   secret: "jdnfksdmfksda"
   #release | debug
   mode: "release"

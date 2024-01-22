@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+import "proto/director.proto";
+import "proto/actor.proto";
+import "proto/genre.proto";
+
+package api.v1;
+option go_package = "grpc-movie/internal/infra/proto/movie";
+
+message Movie {
+    uint64 id = 1;
+    string title = 2;
+    string synopsis = 3;
+    uint32 year = 4;
+    float rating = 5;
+    uint32 duration = 6;
+    uint64 director_id = 7;
+    bool state = 8;
+    api.v1.Director director = 9;
+    repeated api.v1.Actor actors = 10;
+    repeated api.v1.Genre genres = 11;
+    string created_at = 12;
+    string updated_at = 13;
+}
+
+message FilterCriteriaMovie {
+    string genre_name = 1;
+    string movie_title = 2;    
+}
+
+message ListRequestMovie {
+    uint64 page = 1;
+    uint64 page_size = 2;
+    FilterCriteriaMovie filter_criteria = 3;
+}
+
+message RequestByIdMovie {
+    uint64 id = 1;
+}
+
+message ResponseMovie {
+    string title = 1;
+    string message = 2;
+    bool is_ok = 3;
+    int32 status = 4;
+    Movie movie = 5;
+    repeated Movie movies = 6;
+    uint64 total_pages = 7;
+}
+
+service MovieCrud {
+    rpc Insert(Movie) returns (ResponseMovie) {}
+    rpc Update(Movie) returns (ResponseMovie) {}
+    rpc List(ListRequestMovie) returns (ResponseMovie) {}
+    rpc Delete(RequestByIdMovie) returns (ResponseMovie) {}
+    rpc GetById(RequestByIdMovie) returns (ResponseMovie) {}
+}

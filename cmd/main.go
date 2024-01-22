@@ -1,9 +1,9 @@
 package main
 
 import (
+	"grpc-movie/cmd/config"
 	"log"
 	"net"
-	"template-grpc/cmd/config"
 
 	"google.golang.org/grpc"
 )

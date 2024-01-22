@@ -2,9 +2,9 @@ package config
 
 import (
 	"flag"
-	"template-grpc/cmd/handler"
-	repository "template-grpc/internal/domain/repository/implement/user"
-	pb "template-grpc/internal/infra/proto"
+	"grpc-movie/cmd/handler"
+	repository "grpc-movie/internal/domain/repository/implement/user"
+	pb "grpc-movie/internal/infra/proto"
 
 	"google.golang.org/grpc"
 )

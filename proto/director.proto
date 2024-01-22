@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package api.v1;
+option go_package = "grpc-movie/internal/infra/proto/director";
+
+message Director {
+    uint64 id = 1;
+    string name = 2;
+    string birthdate = 3;
+    string avatar = 4;
+    bool state = 5;
+    string created_at = 6;
+    string updated_at = 7;
+}
+
+message ListRequestDirector {
+    uint64 page = 1;
+    uint64 page_size = 2;
+}
+
+message RequestByIdDirector {
+    uint64 id = 1;
+}
+
+message ResponseDirector {
+    string title = 1;
+    string message = 2;
+    bool is_ok = 3;
+    int32 status = 4;
+    Director director = 5;
+    repeated Director directors = 6;
+    uint64 total_pages = 7;
+}
+
+service DirectorCrud {
+    rpc Insert(Director) returns (ResponseDirector) {}
+    rpc Update(Director) returns (ResponseDirector) {}
+    rpc List(ListRequestDirector) returns (ResponseDirector) {}
+    rpc Delete(RequestByIdDirector) returns (ResponseDirector) {}
+    rpc GetById(RequestByIdDirector) returns (ResponseDirector) {}
+}

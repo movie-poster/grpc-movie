@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"template-grpc/internal/domain/entity"
+	"grpc-movie/internal/domain/entity"
 	"time"
 
 	"gorm.io/driver/mysql"

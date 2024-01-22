@@ -3,10 +3,10 @@ package handler
 import (
 	"context"
 	"fmt"
-	repository "template-grpc/internal/domain/repository/implement/user"
-	irepository "template-grpc/internal/domain/repository/interface"
+	repository "grpc-movie/internal/domain/repository/implement/user"
+	irepository "grpc-movie/internal/domain/repository/interface"
 
-	pb "template-grpc/internal/infra/proto"
+	pb "grpc-movie/internal/infra/proto"
 )
 
 func NewServerUser(usercrud irepository.IUserCrud) *server {

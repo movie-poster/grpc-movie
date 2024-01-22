@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package api.v1;
+option go_package = "grpc-movie/internal/infra/proto/genre";
+
+message Genre {
+    uint64 id = 1;
+    string name = 2;
+    bool state = 5;
+    string created_at = 6;
+    string updated_at = 7;
+}
+
+message ListRequestGenre {
+    uint64 page = 1;    
+    uint64 page_size = 2;
+}
+
+message RequestByIdGenre {
+    uint64 id = 1;
+}
+
+message ResponseGenre {
+    string title = 1;
+    string message = 2;
+    bool is_ok = 3;
+    int32 status = 4;
+    Genre genre = 5;
+    repeated Genre genres = 6;
+    uint64 total_pages = 7;
+}
+
+service GenreCrud {
+    rpc Insert(Genre) returns (ResponseGenre) {}
+    rpc List(ListRequestGenre) returns (ResponseGenre) {}
+    rpc Delete(RequestByIdGenre) returns (ResponseGenre) {}
+}

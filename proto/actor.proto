@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package api.v1;
+option go_package = "grpc-movie/internal/infra/proto/actor";
+
+message Actor {
+    uint64 id = 1;
+    string name = 2;
+    string birthdate = 3;
+    string avatar = 4;
+    bool state = 5;
+    string created_at = 6;
+    string updated_at = 7;
+}
+
+message ListRequestActor {
+    uint64 page = 1;
+    uint64 page_size = 2;
+}
+
+message RequestByIdActor {
+    uint64 id = 1;
+}
+
+message ResponseActor {
+    string title = 1;
+    string message = 2;
+    bool is_ok = 3;
+    int32 status = 4;
+    Actor actor = 5;
+    repeated Actor actors = 6;
+    uint64 total_pages = 7;
+}
+
+service ActorCrud {
+    rpc Insert(Actor) returns (ResponseActor) {}
+    rpc Update(Actor) returns (ResponseActor) {}
+    rpc List(ListRequestActor) returns (ResponseActor) {}
+    rpc Delete(RequestByIdActor) returns (ResponseActor) {}
+    rpc GetById(RequestByIdActor) returns (ResponseActor) {}
+}
