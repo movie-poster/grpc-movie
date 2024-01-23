@@ -29,12 +29,12 @@ type Movie struct {
 	unknownFields protoimpl.UnknownFields
 
 	Id         uint64             `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title      string             `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Synopsis   string             `protobuf:"bytes,3,opt,name=synopsis,proto3" json:"synopsis,omitempty"`
-	Year       uint32             `protobuf:"varint,4,opt,name=year,proto3" json:"year,omitempty"`
+	Title      string             `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty" validate:"required"`
+	Synopsis   string             `protobuf:"bytes,3,opt,name=synopsis,proto3" json:"synopsis,omitempty" validate:"required"`
+	Year       uint32             `protobuf:"varint,4,opt,name=year,proto3" json:"year,omitempty" validate:"number"`
 	Rating     float32            `protobuf:"fixed32,5,opt,name=rating,proto3" json:"rating,omitempty"`
-	Duration   uint32             `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty"`
-	DirectorId uint64             `protobuf:"varint,7,opt,name=director_id,json=directorId,proto3" json:"director_id,omitempty"`
+	Duration   uint32             `protobuf:"varint,6,opt,name=duration,proto3" json:"duration,omitempty" validate:"number"`
+	DirectorId uint64             `protobuf:"varint,7,opt,name=director_id,json=directorId,proto3" json:"director_id,omitempty" validate:"number"`
 	State      bool               `protobuf:"varint,8,opt,name=state,proto3" json:"state,omitempty"`
 	Director   *director.Director `protobuf:"bytes,9,opt,name=director,proto3" json:"director,omitempty"`
 	Actors     []*actor.Actor     `protobuf:"bytes,10,rep,name=actors,proto3" json:"actors,omitempty"`

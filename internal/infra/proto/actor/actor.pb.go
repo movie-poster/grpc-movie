@@ -26,8 +26,8 @@ type Actor struct {
 	unknownFields protoimpl.UnknownFields
 
 	Id        uint64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name      string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Birthdate string `protobuf:"bytes,3,opt,name=birthdate,proto3" json:"birthdate,omitempty"`
+	Name      string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty" validate:"required"`
+	Birthdate string `protobuf:"bytes,3,opt,name=birthdate,proto3" json:"birthdate,omitempty" validate:"required"`
 	Avatar    string `protobuf:"bytes,4,opt,name=avatar,proto3" json:"avatar,omitempty"`
 	State     bool   `protobuf:"varint,5,opt,name=state,proto3" json:"state,omitempty"`
 	CreatedAt string `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`

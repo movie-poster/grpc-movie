@@ -65,8 +65,10 @@ func setupDB(configuration *Configuration) {
 
 // Auto migrate project models
 func migration() {
-	DB.AutoMigrate(&entity.User{})
-
+	DB.AutoMigrate(&entity.Genre{})
+	DB.AutoMigrate(&entity.Actor{})
+	DB.AutoMigrate(&entity.Director{})
+	DB.AutoMigrate(&entity.Movie{})
 }
 
 func GetDB() *gorm.DB {

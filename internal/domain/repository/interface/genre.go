@@ -7,6 +7,6 @@ import (
 
 type IGenreCrud interface {
 	Insert(*entity.Genre) *objectvalue.ResponseValue
-	List(page, pageSize uint64) *objectvalue.ResponseValue
+	List(page, pageSize int) *objectvalue.ResponseValue
 	Delete(ID uint64) *objectvalue.ResponseValue
 }

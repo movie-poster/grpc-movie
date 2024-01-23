@@ -8,6 +8,6 @@ import (
 type IActorCrud interface {
 	Insert(*entity.Actor) *objectvalue.ResponseValue
 	Update(*entity.Actor) *objectvalue.ResponseValue
-	List(page, pageSize uint64) *objectvalue.ResponseValue
+	List(page, pageSize int) *objectvalue.ResponseValue
 	Delete(ID uint64) *objectvalue.ResponseValue
 }

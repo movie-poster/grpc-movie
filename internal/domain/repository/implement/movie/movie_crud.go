@@ -27,21 +27,35 @@ func MovieRepository(DB *gorm.DB) irepository.IMovieCrud {
 }
 
 func (u *crud) Insert(movie *entity.Movie) *objectvalue.ResponseValue {
-	err := u.DB.Create(&movie).Error
+	movieQuery := entity.Movie{}
+
+	err := u.DB.Model(&entity.Movie{}).
+		Where("title = ? AND state = ?", movie.Title, constant.ActiveState).
+		First(&movieQuery).Error
 	if err != nil {
-		message := utils.CheckErrorFromDB(err)
-		utils.LogError("Error al guardar el registro", message, "Insert", http.StatusBadRequest, movie)
-		return objectvalue.BadResponseSingle(message)
+		utils.LogWarning("Registro no encontrado", "No se ha encontrado el registro", "Insert", movie)
 	}
 
-	utils.LogSuccess("Registro guardado", "Insert", movie)
-	return &objectvalue.ResponseValue{
-		Title:   "¡Proceso exitoso!",
-		IsOk:    true,
-		Message: "La película se ha creado",
-		Status:  http.StatusCreated,
-		Value:   u.MarshalResponse(movie),
+	if movieQuery.ID == constant.NotExists {
+		err = u.DB.Create(&movie).Error
+		if err != nil {
+			message := utils.CheckErrorFromDB(err)
+			utils.LogError("Error al guardar el registro", message, "Insert", http.StatusBadRequest, movie)
+			return objectvalue.BadResponseSingle(message)
+		}
+
+		utils.LogSuccess("Registro guardado", "Insert", movie)
+		return &objectvalue.ResponseValue{
+			Title:   "¡Proceso exitoso!",
+			IsOk:    true,
+			Message: "La película se ha creado",
+			Status:  http.StatusCreated,
+			Value:   u.MarshalResponse(movie),
+		}
 	}
+
+	utils.LogError("Error al guardar el registro", "El género ya está creado o no hay datos existentes", "Insert", http.StatusBadRequest, movie)
+	return objectvalue.BadResponseSingle("El género ya está creado o no hay datos existentes")
 }
 
 func (u *crud) Update(movie *entity.Movie) *objectvalue.ResponseValue {
@@ -97,8 +111,8 @@ func (u *crud) List(req *pb.ListRequestMovie) *objectvalue.ResponseValue {
 		return &objectvalue.ResponseValue{
 			Title:   "Proceso no exitoso",
 			IsOk:    false,
-			Message: "No se han podido listar los grupos",
-			Status:  http.StatusBadRequest,
+			Message: "No se han podido listar las películas",
+			Status:  http.StatusInternalServerError,
 			Value:   moviesPT,
 		}
 	}
@@ -112,8 +126,8 @@ func (u *crud) List(req *pb.ListRequestMovie) *objectvalue.ResponseValue {
 	return &objectvalue.ResponseValue{
 		Title:   "¡Proceso exitoso!",
 		IsOk:    true,
-		Message: "Listado de grupos",
-		Status:  http.StatusCreated,
+		Message: "Listado de películas",
+		Status:  http.StatusOK,
 		Value:   moviesPT,
 	}
 }

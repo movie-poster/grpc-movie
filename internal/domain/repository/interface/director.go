@@ -8,6 +8,6 @@ import (
 type IDirectorCrud interface {
 	Insert(*entity.Director) *objectvalue.ResponseValue
 	Update(*entity.Director) *objectvalue.ResponseValue
-	List(page, pageSize uint64) *objectvalue.ResponseValue
+	List(page, pageSize int) *objectvalue.ResponseValue
 	Delete(ID uint64) *objectvalue.ResponseValue
 }
