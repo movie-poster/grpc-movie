@@ -83,7 +83,7 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 
 	err := u.DB.Limit(pageSize).
 		Offset(pageSize*page).
-		Find(&actors, "state = ?").Error
+		Find(&actors, "state = ?", constant.ActiveState).Error
 	if err != nil {
 		utils.LogError("Error al listar los registros", "No es posible listar los registros, revisar base de datos", "List", http.StatusBadRequest)
 		return &objectvalue.ResponseValue{

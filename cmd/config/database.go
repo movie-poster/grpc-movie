@@ -53,7 +53,6 @@ func setupDB(configuration *Configuration) {
 	}
 
 	sqlDB, _ := db.DB()
-	// Change this to true if you want to see SQL queries
 
 	db.Logger.LogMode(logger.Info)
 	sqlDB.SetMaxIdleConns(configuration.Database.MaxIdleConns)

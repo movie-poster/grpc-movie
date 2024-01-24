@@ -9,8 +9,9 @@ import (
 var Config *Configuration
 
 type Configuration struct {
-	Server   ServerConfiguration
-	Database DatabaseConfiguration
+	Server     ServerConfiguration
+	Database   DatabaseConfiguration
+	Cloudinary CloudinaryConfiguration
 }
 
 type DatabaseConfiguration struct {
@@ -29,6 +30,10 @@ type ServerConfiguration struct {
 	Port   string
 	Secret string
 	Mode   string
+}
+
+type CloudinaryConfiguration struct {
+	Url string
 }
 
 // SetupDB initialize configuration

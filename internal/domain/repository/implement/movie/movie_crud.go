@@ -105,7 +105,7 @@ func (u *crud) List(req *pb.ListRequestMovie) *objectvalue.ResponseValue {
 
 	err := query.Limit(int(req.GetPageSize())).
 		Offset(int(req.GetPage())*int(req.GetPageSize())).
-		Find(&movies, "state = ?").Error
+		Find(&movies, "state = ?", constant.ActiveState).Error
 	if err != nil {
 		utils.LogError("Error al listar los registros", "No es posible listar los registros, revisar base de datos", "List", http.StatusBadRequest)
 		return &objectvalue.ResponseValue{

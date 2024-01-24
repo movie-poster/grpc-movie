@@ -1,9 +1,9 @@
 database:
   driver: "mysql"
-  dbname: "usuario"
-  username: "admin"
-  password: "micontra33segura"
-  host: "db-services.cnku4mcgwdw8.us-east-2.rds.amazonaws.com"
+  dbname: "grpc-movie"
+  username: "root"
+  password: ""
+  host: "localhost"
   port: "3306"
   max_lifetime: 7200
   max_open_conns: 150
@@ -14,3 +14,6 @@ server:
   secret: "jdnfksdmfksda"
   #release | debug
   mode: "release"
+
+cloudinary:
+  url: "cloudinary://888384369496425:avT9JttLcIRhV3I6B9rj43oPD9Q@rocha4950"

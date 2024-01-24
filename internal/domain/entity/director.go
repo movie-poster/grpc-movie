@@ -10,7 +10,7 @@ type Director struct {
 	Model
 	Name      string    `gorm:"column:name;type:varchar(255);not null"`
 	Birthdate time.Time `gorm:"column:birthdate;type:datetime;not null;"`
-	Avatar    string    `gorm:"column:avatar;type:varchar(255)"`
+	Avatar    string    `gorm:"column:avatar;type:varchar(255);not null"`
 	Movies    []Movie
 	State     bool `gorm:"column:state;type:tinyint(1);not null"`
 }

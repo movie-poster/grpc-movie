@@ -5,20 +5,24 @@ import (
 	"grpc-movie/internal/constant"
 	"grpc-movie/internal/domain/entity"
 	irepository "grpc-movie/internal/domain/repository/interface"
+	pb "grpc-movie/internal/infra/proto/director"
 	"net/http"
 	"time"
 
-	pb "grpc-movie/internal/infra/proto/director"
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 )
 
-func NewServerDirector(crud irepository.IDirectorCrud) *server {
+func NewServerDirector(crud irepository.IDirectorCrud, clientCloudinary *cloudinary.Cloudinary) *server {
 	return &server{
-		crud: crud,
+		crud:       crud,
+		cloudinary: clientCloudinary,
 	}
 }
 
 type server struct {
-	crud irepository.IDirectorCrud
+	crud       irepository.IDirectorCrud
+	cloudinary *cloudinary.Cloudinary
 	pb.UnimplementedDirectorCrudServer
 }
 
@@ -33,9 +37,28 @@ func (s *server) Insert(context context.Context, director *pb.Director) (*pb.Res
 		}, nil
 	}
 
+	uploadResult, err := s.cloudinary.Upload.Upload(
+		context,
+		"data:image/png;base64,"+director.GetAvatar(),
+		uploader.UploadParams{
+			UploadPreset: "movie-preset",
+			Folder:       "director",
+			Format:       "png",
+		},
+	)
+	if err != nil {
+		return &pb.ResponseDirector{
+			Title:   "No fue posibile subir el archivo",
+			IsOk:    false,
+			Message: "Fotografía no subida",
+			Status:  http.StatusBadRequest,
+		}, nil
+	}
+
 	directorObject := &entity.Director{
 		Name:      director.Name,
 		Birthdate: date,
+		Avatar:    uploadResult.SecureURL,
 		State:     constant.ActiveState,
 	}
 
