@@ -5,22 +5,45 @@ import (
 	"grpc-movie/internal/constant"
 	"grpc-movie/internal/domain/entity"
 	irepository "grpc-movie/internal/domain/repository/interface"
+	"net/http"
 
 	pb "grpc-movie/internal/infra/proto/movie"
+
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 )
 
-func NewServerMovie(crud irepository.IMovieCrud) *server {
+func NewServerMovie(crud irepository.IMovieCrud, clientCloudinary *cloudinary.Cloudinary) *server {
 	return &server{
-		crud: crud,
+		crud:       crud,
+		cloudinary: clientCloudinary,
 	}
 }
 
 type server struct {
-	crud irepository.IMovieCrud
+	crud       irepository.IMovieCrud
+	cloudinary *cloudinary.Cloudinary
 	pb.UnimplementedMovieCrudServer
 }
 
 func (s *server) Insert(context context.Context, movie *pb.Movie) (*pb.ResponseMovie, error) {
+	uploadResult, err := s.cloudinary.Upload.Upload(
+		context,
+		"data:image/png;base64,"+movie.GetPoster(),
+		uploader.UploadParams{
+			UploadPreset: "preset-movie",
+			Folder:       "movie",
+			Format:       "png",
+		},
+	)
+	if err != nil {
+		return &pb.ResponseMovie{
+			Title:   "No fue posibile subir el archivo",
+			IsOk:    false,
+			Message: "Fotografía no subida",
+			Status:  http.StatusBadRequest,
+		}, nil
+	}
 
 	movieObject := &entity.Movie{
 		Title:      movie.GetTitle(),
@@ -29,7 +52,20 @@ func (s *server) Insert(context context.Context, movie *pb.Movie) (*pb.ResponseM
 		Rating:     float64(movie.GetRating()),
 		Duration:   movie.GetDuration(),
 		DirectorID: movie.GetDirectorId(),
+		Poster:     uploadResult.SecureURL,
 		State:      constant.ActiveState,
+	}
+
+	for _, actor := range movie.GetActors() {
+		movieObject.Actors = append(movieObject.Actors, entity.Actor{
+			Model: entity.Model{ID: actor.GetId()},
+		})
+	}
+
+	for _, genre := range movie.GetGenres() {
+		movieObject.Actors = append(movieObject.Actors, entity.Actor{
+			Model: entity.Model{ID: genre.GetId()},
+		})
 	}
 
 	response := s.crud.Insert(movieObject)

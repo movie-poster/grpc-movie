@@ -58,10 +58,13 @@ func (u *crud) Update(director *entity.Director) *objectvalue.ResponseValue {
 	directorMap := map[string]any{
 		"name":      director.Name,
 		"birthdate": director.Birthdate,
-		"avatar":    director.Avatar,
 	}
 
-	err := u.DB.Model(entity.Director{}).Where("id = ?", director.ID).Updates(directorMap).Error
+	if utils.IsURL(director.Avatar) {
+		directorMap["avatar"] = director.Avatar
+	}
+
+	err := u.DB.Model(&entity.Director{}).Where("id", director.ID).Updates(directorMap).Error
 	if err != nil {
 		message := utils.CheckErrorFromDB(err)
 		utils.LogError("Error al actualizar el registro", message, "Update", http.StatusBadRequest, director)
@@ -74,10 +77,22 @@ func (u *crud) Update(director *entity.Director) *objectvalue.ResponseValue {
 		IsOk:    true,
 		Message: "Registro actualizado",
 		Status:  http.StatusOK,
+		Value:   u.MarshalResponse(director),
 	}
 }
 
 func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
+	// Contar número de registros
+	countResult := make(chan int64)
+	defer close(countResult)
+
+	go func() {
+		var count int64
+		u.DB.Model(&entity.Director{}).Where("state = ?", constant.ActiveState).Count(&count)
+		countResult <- count
+	}()
+
+	// consulta para traer los registros
 	var directors []*entity.Director
 	var directorsPT []*pb.Director
 
@@ -95,6 +110,8 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 		}
 	}
 
+	totalCount := <-countResult / int64(pageSize)
+
 	for _, movie := range directors {
 		tempMovie := u.MarshalResponse(movie)
 		directorsPT = append(directorsPT, tempMovie)
@@ -107,6 +124,7 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 		Message: "Listado de directores",
 		Status:  http.StatusOK,
 		Value:   directorsPT,
+		Count:   totalCount,
 	}
 }
 
@@ -131,7 +149,7 @@ func (u *crud) MarshalResponse(director *entity.Director) *pb.Director {
 	return &pb.Director{
 		Id:        director.ID,
 		Name:      director.Name,
-		Birthdate: director.Birthdate.String(),
+		Birthdate: utils.FormatDate(director.Birthdate),
 		Avatar:    director.Avatar,
 		State:     director.State,
 		CreatedAt: director.CreatedAt.String(),

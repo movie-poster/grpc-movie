@@ -9,6 +9,7 @@ import (
 type Movie struct {
 	Model
 	Title      string   `gorm:"column:title;type:varchar(255);not null"`
+	Poster     string   `gorm:"column:poster;type:varchar(255);not null"`
 	Synopsis   string   `gorm:"column:synopsis;type:varchar(1000);not null"`
 	Year       uint32   `gorm:"column:year;type:int(11) unsigned;not null"`
 	Rating     float64  `gorm:"column:rating;type:decimal(10,2);not null"`

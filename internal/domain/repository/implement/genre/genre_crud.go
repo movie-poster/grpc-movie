@@ -44,7 +44,7 @@ func (u *crud) Insert(genre *entity.Genre) *objectvalue.ResponseValue {
 		return &objectvalue.ResponseValue{
 			Title:   "¡Proceso exitoso!",
 			IsOk:    true,
-			Message: "La película se ha creado",
+			Message: "El género se ha creado",
 			Status:  http.StatusCreated,
 			Value:   u.MarshalResponse(genre),
 		}
@@ -55,6 +55,17 @@ func (u *crud) Insert(genre *entity.Genre) *objectvalue.ResponseValue {
 }
 
 func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
+	// Contar número de registros
+	countResult := make(chan int64)
+	defer close(countResult)
+
+	go func() {
+		var count int64
+		u.DB.Model(&entity.Genre{}).Where("state = ?", constant.ActiveState).Count(&count)
+		countResult <- count
+	}()
+
+	// consulta para traer los registros
 	var movies []*entity.Genre
 	var moviesPT []*pb.Genre
 
@@ -72,6 +83,8 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 		}
 	}
 
+	totalCount := <-countResult / int64(pageSize)
+
 	for _, movie := range movies {
 		tempMovie := u.MarshalResponse(movie)
 		moviesPT = append(moviesPT, tempMovie)
@@ -84,6 +97,7 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 		Message: "Listado de géneros",
 		Status:  http.StatusOK,
 		Value:   moviesPT,
+		Count:   totalCount,
 	}
 }
 

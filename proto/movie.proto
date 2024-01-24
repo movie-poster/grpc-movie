@@ -21,6 +21,7 @@ message Movie {
     repeated api.v1.Genre genres = 11;
     string created_at = 12;
     string updated_at = 13;
+    string poster = 14;
 }
 
 message FilterCriteriaMovie {

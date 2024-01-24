@@ -43,9 +43,9 @@ func Run(s *grpc.Server, configPath string) *grpc.Server {
 	setupDB(conf)
 	InitCloudinary(conf)
 
-	movie.RegisterMovieCrudServer(s, handler_movie.NewServerMovie(repository_movie.MovieRepository(DB)))
+	movie.RegisterMovieCrudServer(s, handler_movie.NewServerMovie(repository_movie.MovieRepository(DB), GetCloudinaryClient()))
 	genre.RegisterGenreCrudServer(s, handler_genre.NewServerGenre(repository_genre.GenreRepository(DB)))
-	actor.RegisterActorCrudServer(s, handler_actor.NewServerActor(repository_actor.ActorRepository(DB)))
+	actor.RegisterActorCrudServer(s, handler_actor.NewServerActor(repository_actor.ActorRepository(DB), GetCloudinaryClient()))
 	director.RegisterDirectorCrudServer(s, handler_director.NewServerDirector(repository_director.DirectorRepository(DB), GetCloudinaryClient()))
 
 	return s

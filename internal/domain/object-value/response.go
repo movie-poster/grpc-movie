@@ -8,6 +8,7 @@ type ResponseValue struct {
 	IsOk    bool
 	Status  int32
 	Value   any
+	Count   int64
 }
 
 func BadResponseSingle(message string) *ResponseValue {

@@ -54,6 +54,7 @@ func (s *server) List(context context.Context, req *pb.ListRequestGenre) (*pb.Re
 
 	if response.Value != nil {
 		responsePB.Genres = response.Value.([]*pb.Genre)
+		responsePB.TotalPages = uint64(response.Count)
 	}
 
 	return &responsePB, nil

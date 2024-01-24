@@ -174,7 +174,7 @@ func (u *crud) GetById(ID uint64) *objectvalue.ResponseValue {
 		Title:   "¡Proceso exitoso!",
 		IsOk:    true,
 		Message: "Se ha encontrado la película con el ID",
-		Status:  http.StatusCreated,
+		Status:  http.StatusOK,
 		Value:   u.MarshalResponse(movie),
 	}
 }
@@ -183,6 +183,7 @@ func (u *crud) MarshalResponse(movie *entity.Movie) *pb.Movie {
 	moviePT := &pb.Movie{
 		Id:         movie.ID,
 		Title:      movie.Title,
+		Poster:     movie.Poster,
 		Synopsis:   movie.Synopsis,
 		Year:       movie.Year,
 		Rating:     float32(movie.Rating),

@@ -58,10 +58,13 @@ func (u *crud) Update(actor *entity.Actor) *objectvalue.ResponseValue {
 	actorMap := map[string]any{
 		"name":      actor.Name,
 		"birthdate": actor.Birthdate,
-		"avatar":    actor.Avatar,
 	}
 
-	err := u.DB.Model(entity.Actor{}).Where("id = ?", actor.ID).Updates(actorMap).Error
+	if utils.IsURL(actor.Avatar) {
+		actorMap["avatar"] = actor.Avatar
+	}
+
+	err := u.DB.Model(&entity.Actor{}).Where("id", actor.ID).Updates(actorMap).Error
 	if err != nil {
 		message := utils.CheckErrorFromDB(err)
 		utils.LogError("Error al actualizar el registro", message, "Update", http.StatusBadRequest, actor)
@@ -74,10 +77,22 @@ func (u *crud) Update(actor *entity.Actor) *objectvalue.ResponseValue {
 		IsOk:    true,
 		Message: "Registro actualizado",
 		Status:  http.StatusOK,
+		Value:   u.MarshalResponse(actor),
 	}
 }
 
 func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
+	// Contar número de registros
+	countResult := make(chan int64)
+	defer close(countResult)
+
+	go func() {
+		var count int64
+		u.DB.Model(&entity.Actor{}).Where("state = ?", constant.ActiveState).Count(&count)
+		countResult <- count
+	}()
+
+	// consulta para traer los registros
 	var actors []*entity.Actor
 	var actorsPT []*pb.Actor
 
@@ -85,7 +100,7 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 		Offset(pageSize*page).
 		Find(&actors, "state = ?", constant.ActiveState).Error
 	if err != nil {
-		utils.LogError("Error al listar los registros", "No es posible listar los registros, revisar base de datos", "List", http.StatusBadRequest)
+		utils.LogError("Error al listar los registros", "No es posible listar los registros, revisar base de datos", "ListActors", http.StatusBadRequest)
 		return &objectvalue.ResponseValue{
 			Title:   "Proceso no exitoso",
 			IsOk:    false,
@@ -95,18 +110,21 @@ func (u *crud) List(page, pageSize int) *objectvalue.ResponseValue {
 		}
 	}
 
-	for _, movie := range actors {
-		tempMovie := u.MarshalResponse(movie)
-		actorsPT = append(actorsPT, tempMovie)
+	totalCount := <-countResult / int64(pageSize)
+
+	for _, actor := range actors {
+		tempActor := u.MarshalResponse(actor)
+		actorsPT = append(actorsPT, tempActor)
 	}
 
-	utils.LogSuccess("Listado generado exitosamente", "List", page, pageSize)
+	utils.LogSuccess("Listado generado exitosamente", "ListActors", page, pageSize)
 	return &objectvalue.ResponseValue{
 		Title:   "¡Proceso exitoso!",
 		IsOk:    true,
-		Message: "Listado de géneros",
+		Message: "Listado de actores",
 		Status:  http.StatusOK,
 		Value:   actorsPT,
+		Count:   totalCount,
 	}
 }
 
@@ -132,6 +150,8 @@ func (u *crud) MarshalResponse(actor *entity.Actor) *pb.Actor {
 		Id:        actor.ID,
 		Name:      actor.Name,
 		State:     actor.State,
+		Birthdate: utils.FormatDate(actor.Birthdate),
+		Avatar:    actor.Avatar,
 		CreatedAt: actor.CreatedAt.String(),
 		UpdatedAt: actor.UpdatedAt.String(),
 	}

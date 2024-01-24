@@ -6,6 +6,7 @@ import (
 	"grpc-movie/internal/domain/entity"
 	irepository "grpc-movie/internal/domain/repository/interface"
 	pb "grpc-movie/internal/infra/proto/director"
+	"grpc-movie/internal/utils"
 	"net/http"
 	"time"
 
@@ -41,7 +42,7 @@ func (s *server) Insert(context context.Context, director *pb.Director) (*pb.Res
 		context,
 		"data:image/png;base64,"+director.GetAvatar(),
 		uploader.UploadParams{
-			UploadPreset: "movie-preset",
+			UploadPreset: "preset-director",
 			Folder:       "director",
 			Format:       "png",
 		},
@@ -89,9 +90,32 @@ func (s *server) Update(context context.Context, director *pb.Director) (*pb.Res
 		}, nil
 	}
 
+	if !utils.IsURL(director.Avatar) && director.Avatar != "" {
+		uploadResult, err := s.cloudinary.Upload.Upload(
+			context,
+			"data:image/png;base64,"+director.GetAvatar(),
+			uploader.UploadParams{
+				UploadPreset: "preset-director",
+				Folder:       "director",
+				Format:       "png",
+			},
+		)
+		if err != nil {
+			return &pb.ResponseDirector{
+				Title:   "No fue posibile subir el archivo",
+				IsOk:    false,
+				Message: "Fotografía no subida",
+				Status:  http.StatusBadRequest,
+			}, nil
+		}
+		director.Avatar = uploadResult.SecureURL
+	}
+
 	directorObject := &entity.Director{
+		Model:     entity.Model{ID: director.GetId()},
 		Name:      director.Name,
 		Birthdate: date,
+		Avatar:    director.Avatar,
 	}
 
 	response := s.crud.Update(directorObject)
@@ -101,6 +125,10 @@ func (s *server) Update(context context.Context, director *pb.Director) (*pb.Res
 		IsOk:    response.IsOk,
 		Message: response.Message,
 		Status:  response.Status,
+	}
+
+	if response.Value != nil {
+		responsePB.Director = response.Value.(*pb.Director)
 	}
 
 	return &responsePB, nil
@@ -118,6 +146,7 @@ func (s *server) List(context context.Context, req *pb.ListRequestDirector) (*pb
 
 	if response.Value != nil {
 		responsePB.Directors = response.Value.([]*pb.Director)
+		responsePB.TotalPages = uint64(response.Count)
 	}
 
 	return &responsePB, nil
