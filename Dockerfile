@@ -22,10 +22,8 @@ FROM scratch AS runner
 
 COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
 
-COPY .env ./
-
 COPY --from=builder /grpc-movie /grpc-movie
 
-EXPOSE 5050
+EXPOSE 3002
 
 ENTRYPOINT ["/grpc-movie"]
